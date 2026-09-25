@@ -1,14 +1,21 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, User as FirebaseUser } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore with custom databaseId
-// CRITICAL: getFirestore(app, firebaseConfig.firestoreDatabaseId)
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+// Initialize Firestore with custom databaseId and force long polling
+// This prevents WebSocket connection failures in iframe and sandbox environments
+// CRITICAL: Must use firebaseConfig.firestoreDatabaseId
+export const db = initializeFirestore(
+  app,
+  {
+    experimentalForceLongPolling: true,
+  },
+  firebaseConfig.firestoreDatabaseId
+);
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
@@ -73,18 +80,23 @@ export async function testConnection(): Promise<boolean> {
     await getDocFromServer(doc(db, 'test', 'connection'));
     return true;
   } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn('Firebase client is offline or database initializing.');
+    if (
+      error instanceof Error &&
+      (error.message.includes('the client is offline') ||
+        error.message.includes('unavailable') ||
+        error.message.includes('Failed to get document'))
+    ) {
+      console.warn('Firebase client is operating in offline/cached mode until backend connects.');
       return false;
     }
-    // Other errors (e.g. permission-denied or not-found) still indicate connection to server was established
+    // Other statuses (such as permission-denied or not-found) indicate the server was reached
     return true;
   }
 }
 
-// Run connection test at startup
-testConnection().catch((err) => {
-  console.debug('Initial testConnection status:', err);
+// Run connection test at startup safely without uncaught exceptions
+testConnection().catch(() => {
+  // Silent fallback to offline client mode
 });
 
 export { fbSignOut, signInWithPopup };
