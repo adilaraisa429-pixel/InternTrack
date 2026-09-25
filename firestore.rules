@@ -1,0 +1,177 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Master Catch-All Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Health check collection for testConnection()
+    match /test/{testId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Global Hardened Helper Primitives
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && (
+        request.auth.token.email_verified == true ||
+        request.auth.token.firebase.sign_in_provider == 'google.com'
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'adilaraisa429@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Schema Validation Helpers (Anti-Update-Gap)
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'email', 'name', 'role']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.email is string && data.email.size() <= 128 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.role in ['siswa', 'pembimbing', 'admin'];
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['id', 'email', 'name', 'role', 'nisn', 'className', 'status']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.role == 'siswa' &&
+             data.status in ['Aktif', 'Selesai', 'Menunggu Penempatan'];
+    }
+
+    function isValidSupervisor(data) {
+      return data.keys().hasAll(['id', 'email', 'name', 'role', 'position', 'department']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.role == 'pembimbing';
+    }
+
+    function isValidCompany(data) {
+      return data.keys().hasAll(['id', 'name', 'sector', 'address', 'city', 'contactPerson', 'capacity']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 150 &&
+             data.capacity is number && data.capacity >= 0;
+    }
+
+    function isValidAttendance(data) {
+      return data.keys().hasAll(['id', 'studentId', 'date', 'checkInTime', 'status']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.studentId is string && data.studentId.size() <= 128 &&
+             data.status in ['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Tidak hadir'];
+    }
+
+    function isValidJournal(data) {
+      return data.keys().hasAll(['id', 'studentId', 'date', 'title', 'description', 'startTime', 'endTime', 'location', 'status', 'createdAt']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() <= 200 &&
+             data.description is string && data.description.size() <= 5000 &&
+             data.status in ['Menunggu Validasi', 'Disetujui', 'Perlu Revisi'];
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['id', 'conversationId', 'senderId', 'senderName', 'senderRole', 'receiverId', 'text', 'timestamp', 'read']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.text is string && data.text.size() <= 2000 &&
+             data.senderRole in ['siswa', 'pembimbing', 'admin'];
+    }
+
+    function isValidAnnouncement(data) {
+      return data.keys().hasAll(['id', 'title', 'content', 'date', 'authorName', 'authorRole', 'isActive', 'priority']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() <= 200 &&
+             data.content is string && data.content.size() <= 4000 &&
+             data.priority in ['Biasa', 'Penting', 'Mendesak'];
+    }
+
+    // Rules for Admins Collection
+    match /admins/{adminId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isValidId(adminId) && isAdmin();
+    }
+
+    // Rules for User Profiles
+    match /users/{userId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(userId) && isSignedIn() && isValidUser(incoming());
+      allow update: if isValidId(userId) && isSignedIn() && isValidUser(incoming());
+      allow delete: if isValidId(userId) && isAdmin();
+    }
+
+    // Rules for Students Collection
+    match /students/{studentId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(studentId) && isSignedIn() && isValidStudent(incoming());
+      allow update: if isValidId(studentId) && isSignedIn() && isValidStudent(incoming());
+      allow delete: if isValidId(studentId) && isAdmin();
+    }
+
+    // Rules for Supervisors Collection
+    match /supervisors/{supervisorId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(supervisorId) && isSignedIn() && isValidSupervisor(incoming());
+      allow update: if isValidId(supervisorId) && isSignedIn() && isValidSupervisor(incoming());
+      allow delete: if isValidId(supervisorId) && isAdmin();
+    }
+
+    // Rules for Companies Collection
+    match /companies/{companyId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(companyId) && isSignedIn() && isValidCompany(incoming());
+      allow update: if isValidId(companyId) && isSignedIn() && isValidCompany(incoming());
+      allow delete: if isValidId(companyId) && isAdmin();
+    }
+
+    // Rules for Attendance Logs
+    match /attendances/{attendanceId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(attendanceId) && isSignedIn() && isValidAttendance(incoming());
+      allow update: if isValidId(attendanceId) && isSignedIn() && isValidAttendance(incoming());
+      allow delete: if isValidId(attendanceId) && isSignedIn();
+    }
+
+    // Rules for Internship Journals
+    match /journals/{journalId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(journalId) && isSignedIn() && isValidJournal(incoming());
+      allow update: if isValidId(journalId) && isSignedIn() && isValidJournal(incoming());
+      allow delete: if isValidId(journalId) && isSignedIn();
+    }
+
+    // Rules for Chat Messages
+    match /messages/{messageId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(messageId) && isSignedIn() && isValidMessage(incoming());
+      allow update: if isValidId(messageId) && isSignedIn() && isValidMessage(incoming());
+      allow delete: if isValidId(messageId) && isSignedIn();
+    }
+
+    // Rules for Announcements
+    match /announcements/{announcementId} {
+      allow get, list: if isSignedIn();
+      allow create: if isValidId(announcementId) && isSignedIn() && isValidAnnouncement(incoming());
+      allow update: if isValidId(announcementId) && isSignedIn() && isValidAnnouncement(incoming());
+      allow delete: if isValidId(announcementId) && (isAdmin() || isSignedIn());
+    }
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile and role information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["siswa", "pembimbing", "admin"] },
+        "avatar": { "type": "string", "maxLength": 500 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "email", "name", "role"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Admin directory entry for authorization",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "addedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["uid", "email"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student internship profile data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["siswa"] },
+        "avatar": { "type": "string", "maxLength": 500 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "nisn": { "type": "string", "maxLength": 30 },
+        "className": { "type": "string", "maxLength": 50 },
+        "companyId": { "type": "string", "maxLength": 128 },
+        "supervisorId": { "type": "string", "maxLength": 128 },
+        "internshipStartDate": { "type": "string", "maxLength": 30 },
+        "internshipEndDate": { "type": "string", "maxLength": 30 },
+        "totalRequiredDays": { "type": "number" },
+        "status": { "type": "string", "enum": ["Aktif", "Selesai", "Menunggu Penempatan"] }
+      },
+      "required": ["id", "email", "name", "role", "nisn", "className", "status"]
+    },
+    "Supervisor": {
+      "title": "Supervisor",
+      "description": "Mentor or supervisor profile data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["pembimbing"] },
+        "avatar": { "type": "string", "maxLength": 500 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "nip": { "type": "string", "maxLength": 30 },
+        "position": { "type": "string", "maxLength": 100 },
+        "department": { "type": "string", "maxLength": 100 },
+        "companyId": { "type": "string", "maxLength": 128 },
+        "isIndustryMentor": { "type": "boolean" }
+      },
+      "required": ["id", "email", "name", "role", "position", "department"]
+    },
+    "Company": {
+      "title": "Company",
+      "description": "Internship partner company or workplace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 150 },
+        "sector": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 300 },
+        "city": { "type": "string", "maxLength": 100 },
+        "contactPerson": { "type": "string", "maxLength": 100 },
+        "contactEmail": { "type": "string", "maxLength": 128 },
+        "contactPhone": { "type": "string", "maxLength": 30 },
+        "website": { "type": "string", "maxLength": 200 },
+        "logo": { "type": "string", "maxLength": 500 },
+        "capacity": { "type": "number" }
+      },
+      "required": ["id", "name", "sector", "address", "city", "contactPerson", "capacity"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily student attendance check-in and check-out logs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 20 },
+        "checkInTime": { "type": "string", "maxLength": 20 },
+        "checkOutTime": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["Hadir", "Terlambat", "Izin", "Sakit", "Tidak hadir"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "location": { "type": "string", "maxLength": 200 },
+        "verifiedBySupervisor": { "type": "boolean" }
+      },
+      "required": ["id", "studentId", "date", "checkInTime", "status"]
+    },
+    "Journal": {
+      "title": "Journal",
+      "description": "Daily internship journal entry submitted by student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 20 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "startTime": { "type": "string", "maxLength": 20 },
+        "endTime": { "type": "string", "maxLength": 20 },
+        "location": { "type": "string", "maxLength": 200 },
+        "skillsLearned": { "type": "array" },
+        "obstacles": { "type": "string", "maxLength": 1000 },
+        "solution": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["Menunggu Validasi", "Disetujui", "Perlu Revisi"] },
+        "supervisorNotes": { "type": "string", "maxLength": 1000 },
+        "validatedAt": { "type": "string", "maxLength": 50 },
+        "validatedBy": { "type": "string", "maxLength": 100 },
+        "attachments": { "type": "array" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "studentId", "date", "title", "description", "startTime", "endTime", "location", "status", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Direct communication message between student and supervisor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "conversationId": { "type": "string", "maxLength": 256 },
+        "senderId": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "senderRole": { "type": "string", "enum": ["siswa", "pembimbing", "admin"] },
+        "receiverId": { "type": "string", "maxLength": 128 },
+        "text": { "type": "string", "maxLength": 2000 },
+        "timestamp": { "type": "string", "maxLength": 50 },
+        "read": { "type": "boolean" }
+      },
+      "required": ["id", "conversationId", "senderId", "senderName", "senderRole", "receiverId", "text", "timestamp", "read"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "School and internship management official announcements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "content": { "type": "string", "maxLength": 4000 },
+        "date": { "type": "string", "maxLength": 30 },
+        "authorName": { "type": "string", "maxLength": 100 },
+        "authorRole": { "type": "string", "maxLength": 100 },
+        "isActive": { "type": "boolean" },
+        "priority": { "type": "string", "enum": ["Biasa", "Penting", "Mendesak"] }
+      },
+      "required": ["id", "title", "content", "date", "authorName", "authorRole", "isActive", "priority"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Collection of administrator user records"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of system user profiles"
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Collection of student internship participants"
+    },
+    "/supervisors/{supervisorId}": {
+      "schema": "Supervisor",
+      "description": "Collection of mentor and supervisor profiles"
+    },
+    "/companies/{companyId}": {
+      "schema": "Company",
+      "description": "Collection of registered partner companies"
+    },
+    "/attendances/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Collection of attendance check-in and check-out logs"
+    },
+    "/journals/{journalId}": {
+      "schema": "Journal",
+      "description": "Collection of internship activity journal records"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Collection of communication messages"
+    },
+    "/announcements/{announcementId}": {
+      "schema": "Announcement",
+      "description": "Collection of public announcements"
+    }
+  }
+}

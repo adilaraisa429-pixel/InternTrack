@@ -1,0 +1,6 @@
+{
+  "name": "InternTrack",
+  "description": "Sistem manajemen dan pemantauan kegiatan magang terpadu untuk siswa, pembimbing, dan admin sekolah.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
