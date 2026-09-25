@@ -260,7 +260,7 @@ export const AdminSupervisorsView: React.FC = () => {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Contoh: Budi Santoso, M.Kom."
+                  placeholder="Contoh: Hendra Wijaya, S.Kom."
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>

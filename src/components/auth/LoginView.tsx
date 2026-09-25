@@ -6,14 +6,14 @@ import { GraduationCap, Shield, User, Briefcase, ArrowRight, Lock, Cloud, Sparkl
 export const LoginView: React.FC = () => {
   const { login, switchUser, students, supervisors, admin, signInWithGoogle, firebaseUser, isFirebaseConnected } = useApp();
   const [selectedRole, setSelectedRole] = useState<UserRole>('siswa');
-  const [email, setEmail] = useState('budi.santoso@siswa.smk.id');
+  const [email, setEmail] = useState('raisa.adila@siswa.smk.id');
   const [password, setPassword] = useState('password123');
   const [isSigningInGoogle, setIsSigningInGoogle] = useState(false);
 
   const handleRoleChange = (role: UserRole) => {
     setSelectedRole(role);
     if (role === 'siswa') {
-      setEmail('budi.santoso@siswa.smk.id');
+      setEmail('raisa.adila@siswa.smk.id');
     } else if (role === 'pembimbing') {
       setEmail('hendra.wijaya@guru.smk.id');
     } else {
@@ -208,7 +208,7 @@ export const LoginView: React.FC = () => {
                     S
                   </span>
                   <div>
-                    <span className="font-bold text-slate-900">{students[0]?.name || 'Budi Santoso'}</span>
+                    <span className="font-bold text-slate-900">{students[0]?.name || 'Raisa Adila'}</span>
                     <span className="text-slate-500 block text-[11px]">Siswa (XII RPL 1 - Telkom)</span>
                   </div>
                 </div>

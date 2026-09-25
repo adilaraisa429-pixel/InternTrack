@@ -148,7 +148,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Initialize State from LocalStorage or Defaults
   const [students, setStudents] = useState<Student[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.STUDENTS);
-    return saved ? JSON.parse(saved) : INITIAL_STUDENTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Student[];
+        return parsed.map((s) =>
+          s.id === 'std-1' || s.name === 'Budi Santoso'
+            ? {
+                ...s,
+                name: 'Raisa Adila',
+                email: s.email === 'budi.santoso@siswa.smk.id' ? 'raisa.adila@siswa.smk.id' : s.email,
+                avatar:
+                  s.avatar === 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80'
+                    ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+                    : s.avatar,
+              }
+            : s
+        );
+      } catch (e) {
+        return INITIAL_STUDENTS;
+      }
+    }
+    return INITIAL_STUDENTS;
   });
 
   const [supervisors, setSupervisors] = useState<Supervisor[]>(() => {
@@ -175,7 +195,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MESSAGES);
-    return saved ? JSON.parse(saved) : INITIAL_MESSAGES;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Message[];
+        return parsed.map((m) => {
+          let updated = { ...m };
+          if (updated.senderName === 'Budi Santoso') {
+            updated.senderName = 'Raisa Adila';
+          }
+          if (updated.text.includes('Budi')) {
+            updated.text = updated.text.replace(/Budi/g, 'Raisa');
+          }
+          return updated;
+        });
+      } catch (e) {
+        return INITIAL_MESSAGES;
+      }
+    }
+    return INITIAL_MESSAGES;
   });
 
   const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
@@ -354,7 +391,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             collection(db, stdPath),
             (snapshot) => {
               if (!snapshot.empty) {
-                const list = snapshot.docs.map((d) => d.data() as Student);
+                const list = snapshot.docs.map((d) => {
+                  const s = d.data() as Student;
+                  if (s.id === 'std-1' || s.name === 'Budi Santoso') {
+                    const updated: Student = {
+                      ...s,
+                      name: 'Raisa Adila',
+                      email: s.email === 'budi.santoso@siswa.smk.id' ? 'raisa.adila@siswa.smk.id' : s.email,
+                      avatar:
+                        s.avatar === 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80'
+                          ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+                          : s.avatar,
+                    };
+                    if (auth.currentUser && s.name === 'Budi Santoso') {
+                      setDoc(doc(db, 'students', s.id || 'std-1'), updated, { merge: true }).catch(() => {});
+                    }
+                    return updated;
+                  }
+                  return s;
+                });
                 setStudents(list);
               }
             },
@@ -418,7 +473,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             collection(db, msgPath),
             (snapshot) => {
               if (!snapshot.empty) {
-                const list = snapshot.docs.map((d) => d.data() as Message);
+                const list = snapshot.docs.map((d) => {
+                  const m = d.data() as Message;
+                  if (m.senderName === 'Budi Santoso' || m.text.includes('Budi')) {
+                    const updated = {
+                      ...m,
+                      senderName: m.senderName === 'Budi Santoso' ? 'Raisa Adila' : m.senderName,
+                      text: m.text.replace(/Budi/g, 'Raisa'),
+                    };
+                    if (auth.currentUser && m.senderName === 'Budi Santoso') {
+                      setDoc(doc(db, 'messages', m.id), updated, { merge: true }).catch(() => {});
+                    }
+                    return updated;
+                  }
+                  return m;
+                });
                 setMessages(list);
               }
             },

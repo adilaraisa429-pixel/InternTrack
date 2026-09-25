@@ -91,10 +91,10 @@ export const INITIAL_ADMIN: AdminUser = {
 export const INITIAL_STUDENTS: Student[] = [
   {
     id: 'std-1',
-    email: 'budi.santoso@siswa.smk.id',
-    name: 'Budi Santoso',
+    email: 'raisa.adila@siswa.smk.id',
+    name: 'Raisa Adila',
     role: 'siswa',
-    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     phone: '0857-1234-5678',
     nisn: '0068942150',
     className: 'XII RPL 1',
@@ -226,7 +226,7 @@ export const INITIAL_ATTENDANCE: AttendanceRecord[] = [
     verifiedBySupervisor: true,
   },
 
-  // Past dates for std-1 (Budi)
+  // Past dates for std-1 (Raisa)
   {
     id: 'att-6',
     studentId: 'std-1',
@@ -459,7 +459,7 @@ export const INITIAL_MESSAGES: Message[] = [
     senderName: 'Hendra Wijaya, S.Kom.',
     senderRole: 'pembimbing',
     receiverId: 'std-1',
-    text: 'Halo Budi, bagaimana progres integrasi API hari ini di Telkom?',
+    text: 'Halo Raisa, bagaimana progres integrasi API hari ini di Telkom?',
     timestamp: '2026-09-10 09:15',
     read: true,
   },
@@ -467,7 +467,7 @@ export const INITIAL_MESSAGES: Message[] = [
     id: 'msg-2',
     conversationId: 'std-1_sup-1',
     senderId: 'std-1',
-    senderName: 'Budi Santoso',
+    senderName: 'Raisa Adila',
     senderRole: 'siswa',
     receiverId: 'sup-1',
     text: 'Selamat pagi Pak Hendra. Alhamdulillah lancar Pak, saat ini sedang setup token refresh Axios dan Redux Toolkit. Ada sedikit kendala infinite loop tadi tapi sudah teratasi.',
@@ -481,7 +481,7 @@ export const INITIAL_MESSAGES: Message[] = [
     senderName: 'Hendra Wijaya, S.Kom.',
     senderRole: 'pembimbing',
     receiverId: 'std-1',
-    text: 'Bagus sekali Budi. Jangan lupa jurnal kegiatan kemarin ada catatan revisi ya, mohon lampirkan screenshot testing Postman-nya agar bisa langsung saya setujui.',
+    text: 'Bagus sekali Raisa. Jangan lupa jurnal kegiatan kemarin ada catatan revisi ya, mohon lampirkan screenshot testing Postman-nya agar bisa langsung saya setujui.',
     timestamp: '2026-09-10 10:00',
     read: true,
   },
@@ -489,7 +489,7 @@ export const INITIAL_MESSAGES: Message[] = [
     id: 'msg-4',
     conversationId: 'std-1_sup-1',
     senderId: 'std-1',
-    senderName: 'Budi Santoso',
+    senderName: 'Raisa Adila',
     senderRole: 'siswa',
     receiverId: 'sup-1',
     text: 'Baik Pak, segera saya upload ulang di sistem sore ini setelah jam kantor selesai. Terima kasih banyak arahannya Pak.',
